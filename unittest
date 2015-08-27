@@ -1,0 +1,298 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>VOCiStreaming</groupId>
+	<artifactId>VOCiStreaming</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>VOCiStreaming</name>
+	<description>VOCiStreaming</description>
+
+	<properties>
+		<storm.kafka.version>0.9.1.2.1.5.0-695</storm.kafka.version>
+		<jackson.version>2.4.4</jackson.version>
+		<!-- Only unit tests are run by default. -->
+		<skip.integration.tests>false</skip.integration.tests>
+		<skip.unit.tests>false</skip.unit.tests>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20140107</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.storm</groupId>
+			<artifactId>storm-kafka</artifactId>
+			<version>${storm.kafka.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<!-- Jackson Dependency for XML conversion -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.8.5</version>
+		</dependency>
+
+		<!-- Java dependencies -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>15.0</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.surefire</groupId>
+			<artifactId>maven-surefire-common</artifactId>
+			<version>2.15</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.4.201502262128</version>
+				<!-- <version>0.7.5.201505241946</version> -->
+				<configuration>
+					<sourceExcludes>
+						<sourceExclude>**/vz/**</sourceExclude>
+					</sourceExcludes>
+					<sourceIncludes>
+						<sourceInclude>**/*.vocistreaming</sourceInclude>
+					</sourceIncludes>
+				</configuration>
+				<executions>
+					
+					<!-- Start UT -->
+					<execution>
+						<id>pre-unit-test</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
+							<!-- passing property which will contains settings for JaCoCo agent. 
+								If not specified, then "argLine" would be used for "jar" packaging -->
+							<propertyName>surefireArgLine</propertyName>
+						</configuration>
+					</execution>
+					<!-- report phase setup -->
+					<execution>
+						<id>post-unit-test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration> <!-- output file with report data. -->
+							<dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+							<!-- output directory for the reports. -->
+							<outputDirectory>${project.build.directory}/coverage-reports/jacoco-ut</outputDirectory>
+						</configuration>
+					</execution>
+					<!-- End UT -->
+
+					<!-- Start IT -->
+					<execution>
+						<id>pre-integration-test</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<!-- Sets the path to the file which contains the execution data. -->
+							<destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
+							<!-- Sets the name of the property containing the settings for JaCoCo 
+								runtime agent. -->
+							<propertyName>failsafeArgLine</propertyName>
+						</configuration>
+					</execution>
+
+					<!-- Ensures that the code coverage report for integration tests after 
+						integration tests have been run. -->
+					<execution>
+						<id>post-integration-test</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<!-- Sets the path to the file which contains the execution data. -->
+							<dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
+							<!-- Sets the output directory for the code coverage report. -->
+							<outputDirectory>${project.build.directory}/coverage-reports/jacoco-it</outputDirectory>
+						</configuration>
+					</execution>
+					<!-- End IT -->
+
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12.2</version>
+				<executions>
+					<execution>
+						<id>default-test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<configuration>
+							<argLine>${surefireArgLine}</argLine>
+							<!-- <argLine>-javaagent:"C:\Rajesh\jar\jacoco\jacocoagent.jar"=destfile=${project.build.directory}\coverage-reports\jacoco-ut.exec</argLine> -->
+							<!-- Skips Unit tests if the value of skip.unit.tests property is 
+								true -->
+							<skipTests>${skip.unit.tests}</skipTests>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<argLine>-XX:MaxPermSize=512m</argLine>
+					<!-- Excludes integration tests when unit tests are run. -->
+					<excludes>
+						<exclude>**/ITTest.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+
+			<!-- Maven FailSafe plugin automatically run integration test -->
+			<!-- Used for integration tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.12.4</version>
+				<executions>
+					<!-- Ensures that both integration-test and verify goals of the Failsafe 
+						Maven plugin are executed. -->
+					<execution>
+						<id>integration-test</id>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+						<configuration>
+							<argLine>${failsafeArgLine}</argLine>
+							<skipTests>${skip.integration.tests}</skipTests>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<includes>
+						<include>**/*ITTest.java</include>
+						<include>**/*IT.java</include>
+					</includes>
+					<argLine>-XX:MaxPermSize=512M</argLine>
+				</configuration>
+			</plugin>
+
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<!-- get all project dependencies -->
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<!-- MainClass in Manifest file to make an executable jar -->
+					<archive>
+						<manifest>
+							<mainClass>com.vz.voci.service.VOCiService</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<!-- bind to the packaging phase -->
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!--This points to OneArtifactory -->
+	<!--<repositories> <repository> <id>Maven_Repo_1</id> <name>Verizon Artifactory-releases</name> 
+		<url>http://oneartifactory.verizon.com/artifactory/repo1-cache</url> </repository> 
+		<repository> <id>Verizon Artifactory</id> <name>Verizon Artifactory-releases</name> 
+		<url>http://oneartifactory.verizon.com/artifactory/HDP</url> </repository> 
+		</repositories> -->
+	<!-- Without artifactory, the repositories are declared in the following 
+		way -->
+	<repositories>
+		<repository>
+			<id>org.maven</id>
+			<url>http://repo1.maven.org/maven2</url>
+		</repository>
+		<repository>
+			<id>hortonworks</id>
+			<url>http://repo.hortonworks.com/content/repositories/releases//</url>
+		</repository>
+	</repositories>
+
+	<!--marked for deletion -->
+	<!-- <pluginRepositories> <pluginRepository> <id>spring-releases</id> <url>https://repo.spring.io/libs-release</url> 
+		</pluginRepository> </pluginRepositories> -->
+
+
+</project>

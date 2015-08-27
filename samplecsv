@@ -1,0 +1,50 @@
+ string header = "userid,username,state,age,gender,planname,plandata,plantext,planvoice,planamount,Avgdata,Avgtext,Avgvoice,status,planproposed ";
+            writecsv(header);
+
+            string[] states = { "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia",	"Hawaii" };
+            string[] gender = { "M", "F" };
+            string[] plans = { "Plan A,500,100,500,30", "Plan B,1000,0,500,40", "Plan C,100,100,100,10", "Plan D,0,1000,1000,25" };
+            string[] oldplans = { "Plan A1,600,250,600,40", "Plan B1,2000,150,700,70", "Plan C1,150,100,100,20", "Plan D1,0,1000,1000,55" };
+            
+             Random random = new Random();
+
+            string a= string.Empty;
+            string b=string.Empty;
+            for (int i = 0; i <= 1000; i++)
+            {
+                 a=i.ToString() + "," + "test" + i.ToString() + "," + states[new Random().Next(0, states.Length)] + "," + random.Next(15, 70).ToString() + "," + gender[new Random().Next(0, gender.Length)] + "," ;
+                 b = plans[random.Next(0, plans.Length)] + "," + random.Next(0, 1000).ToString() + "," + random.Next(0, 300) + "," + random.Next(50, 500) +",Active,1";
+                 writecsv(string.Concat( a , b));
+                if (i <= 450) 
+                {
+                    b = oldplans[random.Next(0, oldplans.Length)] + "," + random.Next(0, 1000).ToString() + "," + random.Next(0, 300) + "," + random.Next(50, 500) + ",Inactive," + random.Next(0, 2);
+                    writecsv(string.Concat(a, b));
+                }
+                if (i <= 150)
+                {
+                    b = oldplans[random.Next(0, oldplans.Length)] + "," + random.Next(0, 1000).ToString() + "," + random.Next(0, 300) + "," + random.Next(50, 500) + ",Inactive," + random.Next(0, 2);
+                    writecsv(string.Concat(a, b));
+                }
+                
+            }
+            Console.WriteLine("done");
+            
+             public static void writecsv(string msg)
+        {
+            try
+            {
+                string logpath = @"C:\\test.csv";
+
+                //if (!Directory.Exists(logpath))
+                //{
+                //    Directory.CreateDirectory(logpath);
+                //}
+                StreamWriter log = new StreamWriter(logpath, true);
+                log.WriteLine(msg);
+                log.Flush();
+                log.Close();
+            }
+            catch
+            {
+            }
+        }
